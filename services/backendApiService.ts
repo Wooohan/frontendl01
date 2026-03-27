@@ -236,6 +236,9 @@ export interface CarrierFilters {
   bipdOnFile?: string;
   cargoOnFile?: string;
   bondOnFile?: string;
+  trustFundOnFile?: string;
+  insCancellationDateFrom?: string;
+  insCancellationDateTo?: string;
   oosMin?: number;
   oosMax?: number;
   crashesMin?: number;
@@ -281,6 +284,9 @@ export const fetchCarriersFromBackend = async (filters: CarrierFilters = {}): Pr
     if (filters.bipdOnFile) params.append('bipd_on_file', filters.bipdOnFile);
     if (filters.cargoOnFile) params.append('cargo_on_file', filters.cargoOnFile);
     if (filters.bondOnFile) params.append('bond_on_file', filters.bondOnFile);
+    if (filters.trustFundOnFile) params.append('trust_fund_on_file', filters.trustFundOnFile);
+    if (filters.insCancellationDateFrom) params.append('ins_cancellation_date_from', filters.insCancellationDateFrom);
+    if (filters.insCancellationDateTo) params.append('ins_cancellation_date_to', filters.insCancellationDateTo);
     if (filters.yearsInBusinessMin !== undefined) params.append('years_in_business_min', String(filters.yearsInBusinessMin));
     if (filters.yearsInBusinessMax !== undefined) params.append('years_in_business_max', String(filters.yearsInBusinessMax));
     if (filters.oosMin !== undefined) params.append('oos_min', String(filters.oosMin));
@@ -841,25 +847,28 @@ export const deleteNewVenture = async (id: string): Promise<boolean> => {
   }
 };
 
-export interface ActiveInsurancePolicy {
+export interface InsuranceHistoryPolicy {
   type: string;
-  class: string;
   coverageAmount: string;
   policyNumber: string;
   effectiveDate: string;
   carrier: string;
   formCode: string;
+  transDate: string;
+  underlLimAmount: string;
+  canclEffectiveDate: string;
+  status: string;
 }
 
-export const fetchActiveInsurance = async (mcNumber: string): Promise<ActiveInsurancePolicy[]> => {
+export const fetchInsuranceHistory = async (mcNumber: string): Promise<InsuranceHistoryPolicy[]> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/carriers/${mcNumber}/active-insurance`, {
+    const response = await fetch(`${BACKEND_URL}/api/carriers/${mcNumber}/insurance-history`, {
       headers: authHeadersGet(),
     });
     const data = await handleResponse(response);
     return data.policies || [];
   } catch (err: any) {
-    console.error('Backend fetch active insurance error:', err);
+    console.error('Backend fetch insurance history error:', err);
     return [];
   }
 };
